@@ -1,0 +1,23 @@
+{
+  "name": "pawer",
+  "version": "0.0.1",
+  "description": "A discord bot",
+  "main": "src/bot.js",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cuteecactus/pawer-bot.git"
+  },
+  "author": "CuteeCactus",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cuteecactus/pawer-bot/issues"
+  },
+  "homepage": "https://github.com/cuteecactus/pawer-bot#readme",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3"
+  }
+}
