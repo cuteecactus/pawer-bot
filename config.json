@@ -1,0 +1,9 @@
+{
+    "bot": {
+        "client-id": "1460854709261832346"
+    },
+    "command-test-mode": {
+        "enabled": true,
+        "guild-id": "1195965320515571753"
+    }
+}
