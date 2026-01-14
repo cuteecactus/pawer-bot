@@ -6,18 +6,18 @@ const {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('ban')
-        .setDescription('Bans a user from the server')
+        .setName('kick')
+        .setDescription('Kicks a user from the server')
         .addUserOption(option =>
             option
                 .setName('user')
-                .setDescription('The user to ban')
+                .setDescription('The user to kick')
                 .setRequired(true)
         )
         .addStringOption(option =>
             option
                 .setName('reason')
-                .setDescription('Reason for the ban')
+                .setDescription('Reason for the kick')
                 .setRequired(false)
         ),
 
@@ -29,18 +29,18 @@ module.exports = {
         const reason =
             interaction.options.getString('reason') || 'No reason provided';
 
-        // Permission check (user)
-        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+        // User permission check
+        if (!interaction.member.permissions.has(PermissionFlagsBits.KickMembers)) {
             return interaction.reply({
-                content: '❌ You do not have permission to ban members.',
+                content: '❌ You do not have permission to kick members.',
                 ephemeral: true
             });
         }
 
-        // Permission check (bot)
-        if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+        // Bot permission check
+        if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
             return interaction.reply({
-                content: '❌ I do not have permission to ban members.',
+                content: '❌ I do not have permission to kick members.',
                 ephemeral: true
             });
         }
@@ -55,7 +55,7 @@ module.exports = {
         // Owner check
         if (target.id === interaction.guild.ownerId) {
             return interaction.reply({
-                content: '❌ You cannot ban the server owner.',
+                content: '❌ You cannot kick the server owner.',
                 ephemeral: true
             });
         }
@@ -63,23 +63,23 @@ module.exports = {
         // Self check
         if (target.id === interaction.user.id) {
             return interaction.reply({
-                content: '❌ You cannot ban yourself.',
+                content: '❌ You cannot kick yourself.',
                 ephemeral: true
             });
         }
 
         // Hierarchy check
-        if (!target.bannable) {
+        if (!target.kickable) {
             return interaction.reply({
-                content: '❌ I cannot ban this user due to role hierarchy.',
+                content: '❌ I cannot kick this user due to role hierarchy.',
                 ephemeral: true
             });
         }
 
-        await target.ban({ reason });
+        await target.kick(reason);
 
         await interaction.reply({
-            content: `🔨 **${target.user.tag}** has been banned.\n**Reason:** ${reason}`
+            content: `👢 **${target.user.tag}** has been kicked.\n**Reason:** ${reason}`
         });
     }
 };
