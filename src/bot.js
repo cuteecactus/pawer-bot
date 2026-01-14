@@ -12,6 +12,7 @@ const bot = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildPresences,
   ],
 });
 
@@ -70,7 +71,7 @@ bot.on('messageCreate', async message => {
         await command.execute(message, args, bot);
     } catch (error) {
         console.error(error);
-        message.reply('There was an error executing that command.');
+        message.reply({ content: 'There was an error executing that command.', ephemeral: true });
     }
 });
 
