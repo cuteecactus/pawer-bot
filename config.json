@@ -1,6 +1,7 @@
 {
     "bot": {
-        "client-id": "1460854709261832346"
+        "client-id": "1460854709261832346",
+        "prefix": "!"
     },
     "command-test-mode": {
         "enabled": true,
