@@ -1,5 +1,6 @@
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 const config = require("../config.json")
 
@@ -16,23 +17,25 @@ const bot = new Client({
   ],
 });
 
-// Command collection
+const getCommandFiles = require('./utils/get-command-files');
+
+// Slash commands
 bot.commands = new Collection();
 
-// Load commands
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
+const commandFiles = getCommandFiles(path.join(__dirname, 'commands'));
+
+for (const filePath of commandFiles) {
+    const command = require(filePath);
     bot.commands.set(command.data.name, command);
 }
 
-// Chat Command collection
+// Chat commands
 bot.chatCommands = new Collection();
 
-// Load chat commands dynamically
-const chatCommandFiles = fs.readdirSync('./src/chat-commands').filter(f => f.endsWith('.js'));
-for (const file of chatCommandFiles) {
-    const command = require(`./chat-commands/${file}`);
+const chatCommandFiles = getCommandFiles(path.join(__dirname, 'chat-commands'));
+
+for (const filePath of chatCommandFiles) {
+    const command = require(filePath);
     bot.chatCommands.set(command.name, command);
 }
 
