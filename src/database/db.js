@@ -24,4 +24,15 @@ export const statements = {
     )
 };
 
+statements.getUser = db.prepare(
+    "SELECT * FROM users WHERE guild_id = ? AND user_id = ?"
+);
+statements.insertUser = db.prepare(
+    "INSERT OR IGNORE INTO users (guild_id, user_id, data) VALUES (?, ?, ?)"
+);
+statements.updateUser = db.prepare(
+    "UPDATE users SET data = ? WHERE guild_id = ? AND user_id = ?"
+);
+
+
 export default db;
