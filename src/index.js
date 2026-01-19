@@ -3,10 +3,16 @@ import "dotenv/config";
 import "./database/db.js";
 import { loadGuild } from "./services/guildService.js";
 import { autoSaveAll } from "./services/userService.js";
-import { loadCommands } from "./commands/commandHandler.js";
+import { loadCommands, handleCommand } from "./commands/commandHandler.js";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessages,
+
+  ]
 });
 
 setInterval(() => {
@@ -19,7 +25,7 @@ setInterval(() => {
 }, 5 * 60 * 1000); // every 5 minutes
 
 client.once("ready", () => {
-  console.log(`Pawer online as ${client.user.tag}`);
+  console.log(`✅Pawer online as ${client.user.tag}`);
   client.guilds.cache.forEach(g => loadGuild(g.id));
   loadCommands();
 });
@@ -28,6 +34,6 @@ client.on("guildCreate", guild => {
   loadGuild(guild.id);
 });
 
-// client.on("messageCreate", handleCommand);
+client.on("messageCreate", handleCommand);
 
 client.login(process.env.TOKEN);
