@@ -6,6 +6,7 @@ import { autoSaveAll } from "./services/userService.js";
 import { loadCommands, handleCommand } from "./commands/commandHandler.js";
 import { loadMessageCommands, handleMessage } from "./handlers/messageHandler.js";
 import { loadSlashCommands, handleSlash } from "./handlers/slashHandler.js";
+import { checkSpam } from "./services/antiSpamService.js";
 
 const client = new Client({
   intents: [
@@ -29,7 +30,7 @@ setInterval(() => {
 client.once("ready", async () => {
   console.log(`✅Pawer online as ${client.user.tag}`);
   client.guilds.cache.forEach(g => loadGuild(g.id));
-   await loadMessageCommands();
+  await loadMessageCommands();
   await loadSlashCommands(client);
 });
 
@@ -37,7 +38,27 @@ client.on("guildCreate", guild => {
   loadGuild(guild.id);
 });
 
-client.on("messageCreate", handleMessage);
+client.on("messageCreate", async message => {
+  if (!message.guild || message.author.bot) return;
+
+  const isSpam = checkSpam(message.guild.id, message.author.id);
+
+  if (isSpam) {
+    try {
+      await message.delete();
+
+      const warning = await message.channel.send(
+        `⚠️ ${message.author}, slow down. You're sending messages too fast.`
+      );
+
+      setTimeout(() => warning.delete().catch(() => {}), 3000);
+    } catch (_) {}
+
+    return; // STOP processing commands
+  }
+  
+  handleMessage
+});
 client.on("interactionCreate", handleSlash);
 
 client.login(process.env.TOKEN);
