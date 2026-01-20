@@ -10,10 +10,7 @@ export function loadGuild(guildId) {
     guild = statements.getGuild.get(guildId);
   }
 
-  guild.settings = guild.settings
-    ? JSON.parse(guild.settings)
-    : {};
-
+  guild.settings = guild.settings ? JSON.parse(guild.settings) : {};
   guildCache.set(guildId, guild);
   return guild;
 }
@@ -22,10 +19,17 @@ export function getGuild(guildId) {
   return guildCache.get(guildId) || loadGuild(guildId);
 }
 
-export function updateGuild(guildId, settings) {
-  const json = JSON.stringify(settings);
-  statements.updateGuild.run(json, guildId);
+export function updateGuild(guildId, newSettings) {
+  const guild = getGuild(guildId);
 
-  const cached = guildCache.get(guildId);
-  if (cached) cached.settings = settings;
+  // 🔥 MERGE, don't overwrite
+  const mergedSettings = {
+    ...guild.settings,
+    ...newSettings
+  };
+
+  statements.updateGuild.run(JSON.stringify(mergedSettings), guildId);
+
+  guild.settings = mergedSettings;
+  guildCache.set(guildId, guild);
 }
