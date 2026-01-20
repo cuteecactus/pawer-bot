@@ -1,5 +1,5 @@
 import { deafenLogic } from "./logic.js";
-
+export const name = "deafen";
 export async function execute(message, args) {
   const target =
     message.mentions.members.first() ||

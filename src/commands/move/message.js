@@ -1,5 +1,5 @@
 import { moveLogic } from "./logic.js";
-
+export const name = "move";
 export async function execute(message, args) {
   const target =
     message.mentions.members.first() ||

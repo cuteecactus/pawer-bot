@@ -1,5 +1,5 @@
 import { undeafenLogic } from "./logic.js";
-
+export const name = "undeafen";
 export async function execute(message, args) {
   const target =
     message.mentions.members.first() ||
