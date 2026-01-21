@@ -41,23 +41,34 @@ client.on("guildCreate", guild => {
 client.on("messageCreate", async message => {
   if (!message.guild || message.author.bot) return;
 
-  const isSpam = checkSpam(message.guild.id, message.author.id);
-
-  if (isSpam) {
-    try {
-      await message.delete();
-
-      const warning = await message.channel.send(
-        `⚠️ ${message.author}, slow down. You're sending messages too fast.`
-      );
-
-      setTimeout(() => warning.delete().catch(() => {}), 3000);
-    } catch (_) {}
-
-    return; // STOP processing commands
+  const result = checkSpam(message);
+  if (!result.spam) {
+    handleMessage(message);
+    return;
   }
+
+  // Always delete spam message
+  await message.delete().catch(() => {});
+
+  // Warn user if violations < max
+  if (result.violations < result.config.maxViolations) {
+    const warnMsg = await message.channel.send(
+      `⚠️ ${message.author}, slow down! (${result.violations}/${result.config.maxViolations})`
+    );
+    setTimeout(() => warnMsg.delete().catch(() => {}), 4000);
+    return;
+  }
+
+  // Timeout on final violation
+  try {
+    const member = await message.guild.members.fetch(message.author.id);
+    if (member.moderatable) {
+      await member.timeout(result.config.timeoutSeconds * 1000, "Anti-spam system");
+      message.channel.send(`🔇 ${message.author} has been timed out for spamming.`);
+    }
+  } catch (_) {}
   
-  handleMessage
+  
 });
 client.on("interactionCreate", handleSlash);
 
