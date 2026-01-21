@@ -10,7 +10,7 @@ export async function unmuteLogic({ guild, executor, target }) {
     };
   }
 
-  const guildData = getGuild(guild.id);
+  const guildData = await getGuild(guild.id);
   const muteRoleId = guildData.settings?.muteRoleId;
 
   if (!muteRoleId) {

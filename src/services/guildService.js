@@ -1,35 +1,54 @@
-import { statements } from "../database/db.js";
+import { pool } from "../database/mysql.js";
 
 const guildCache = new Map();
 
-export function loadGuild(guildId) {
-  let guild = statements.getGuild.get(guildId);
+const DEFAULT_SETTINGS = {
+  prefix: "!",
+  antispam: {
+    enabled: true,
+    warnBeforePunish: true,
+    whitelist: {
+      roles: [],
+      users: [],
+      channels: []
+    }
+  }
+};
 
-  if (!guild) {
-    statements.insertGuild.run(guildId, Date.now());
-    guild = statements.getGuild.get(guildId);
+export async function loadGuild(guildId) {
+  const [rows] = await pool.query(
+    "SELECT settings FROM guilds WHERE guild_id = ?",
+    [guildId]
+  );
+
+  let settings;
+
+  if (!rows.length) {
+    settings = structuredClone(DEFAULT_SETTINGS);
+
+    await pool.query(
+      "INSERT INTO guilds (guild_id, settings, created_at) VALUES (?, ?, ?)",
+      [guildId, JSON.stringify(settings), Date.now()]
+    );
+  } else {
+    settings = JSON.parse(rows[0].settings);
   }
 
-  guild.settings = guild.settings ? JSON.parse(guild.settings) : {};
+  const guild = { id: guildId, settings };
   guildCache.set(guildId, guild);
   return guild;
 }
 
-export function getGuild(guildId) {
-  return guildCache.get(guildId) || loadGuild(guildId);
+export async function getGuild(guildId) {
+  return guildCache.get(guildId) ?? loadGuild(guildId);
 }
 
-export function updateGuild(guildId, newSettings) {
-  const guild = getGuild(guildId);
+export async function updateGuild(guildId, settings) {
+  await pool.query(
+    "UPDATE guilds SET settings = ? WHERE guild_id = ?",
+    [JSON.stringify(settings), guildId]
+  );
 
-  // 🔥 MERGE, don't overwrite
-  const mergedSettings = {
-    ...guild.settings,
-    ...newSettings
-  };
-
-  statements.updateGuild.run(JSON.stringify(mergedSettings), guildId);
-
-  guild.settings = mergedSettings;
-  guildCache.set(guildId, guild);
+  const cached = guildCache.get(guildId);
+  if (cached) cached.settings = settings;
 }

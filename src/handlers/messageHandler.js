@@ -21,7 +21,7 @@ export async function loadMessageCommands() {
 export async function handleMessage(message) {
   if (!message.guild || message.author.bot) return;
 
-  const guild = getGuild(message.guild.id);
+  const guild = await getGuild(message.guild.id);
   const prefix = guild.settings?.prefix || "!";
 
   if (!message.content.startsWith(prefix)) return;

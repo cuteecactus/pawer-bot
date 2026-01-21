@@ -51,11 +51,11 @@ function isWhitelisted(message, config) {
 /**
  * Returns {spam: boolean, violations: number, config: object}
  */
-export function checkSpam(message) {
+export async function checkSpam(message) {
   const { guild, author } = message;
   const now = Date.now();
 
-  const guildData = getGuild(guild.id);
+  const guildData = await getGuild(guild.id);
   const config = {
     ...DEFAULT_ANTISPAM,
     ...guildData.settings?.antispam
@@ -97,8 +97,8 @@ export function checkSpam(message) {
  */
 import { updateGuild } from "./guildService.js";
 
-export function toggleAntiSpam(guildId) {
-  const guild = getGuild(guildId);
+export async function toggleAntiSpam(guildId) {
+  const guild = await getGuild(guildId);
 
   guild.settings.antispam ??= {};
   guild.settings.antispam.enabled = !guild.settings.antispam.enabled;

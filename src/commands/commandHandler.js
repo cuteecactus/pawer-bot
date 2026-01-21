@@ -23,10 +23,10 @@ export async function loadCommands() {
   }
 }
 
-export function handleCommand(message) {
+export async function handleCommand(message) {
   if (message.author.bot || !message.guild) return;
 
-  const guild = getGuild(message.guild.id);
+  const guild = await getGuild(message.guild.id);
   const prefix = guild.settings?.prefix || "!";
 
   if (!message.content.startsWith(prefix)) return;

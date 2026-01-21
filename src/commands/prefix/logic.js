@@ -1,7 +1,7 @@
 import { getGuild, updateGuild } from "../../services/guildService.js";
 
 export async function prefixLogic({ guildId, member, args }) {
-  const guild = getGuild(guildId);
+  const guild = await await getGuild(guildId);
   const current = guild.settings?.prefix || "!";
 
   if (!args[0]) {
@@ -25,7 +25,7 @@ export async function prefixLogic({ guildId, member, args }) {
       message: "Prefix too long (max 5 chars)."
     };
   }
-
+ 
   guild.settings.prefix = newPrefix;
   updateGuild(guildId, guild.settings);
 
